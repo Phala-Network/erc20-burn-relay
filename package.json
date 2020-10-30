@@ -1,0 +1,28 @@
+{
+  "name": "phala-erc20-crawler",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@polkadot/util": "^3.6.1",
+    "@polkadot/util-crypto": "^3.6.1",
+    "axios": "^0.20.0",
+    "bn.js": "^5.1.3",
+    "ethers": "^5.0.18",
+    "keythereum": "^1.2.0"
+  },
+  "devDependencies": {
+    "@polkadot/api": "^2.3.1",
+    "chai": "^4.2.0",
+    "keccak": "^3.0.1",
+    "keccak256": "^1.0.1",
+    "portfinder": "^1.0.28",
+    "secp256k1": "^4.0.2"
+  }
+}
