@@ -5,7 +5,8 @@ const { ApiPromise, WsProvider, Keyring } = require('@polkadot/api');
 const { cryptoWaitReady } = require('@polkadot/util-crypto');
 const BN = require('bn.js');
 
-const types = require('./typedefs.json');
+const types = require('../config/typedefs.json');
+const config = require('../config/config.json');
 
 const ETHERSCAN_API_URL_MAP = {
     main: 'https://api.etherscan.io',
@@ -80,17 +81,19 @@ async function assertSuccess(txBuilder, signer) {
 }
 
 const worker = async () => {
-    const network = 'kovan'
-    const contractAddress = '0xfe0c0a5a7fdeb2ecae3e1567568923e035472091'
-    const defultStartBlock = 21639939;
-    const apikey = 'IMP1BNWD46ZT1SMTGIY12YY5V3AN7W6486'
+    const network = config.network;
+    const contractAddress = config.contract;
+    const defultStartBlock = config.startBlock;
+    const apikey = config.startBlock;
 
-    const wsEndPoint = 'ws://127.0.0.1:9944'
+    const wsEndPoint = config.endPoint;
     const wsProvider = new WsProvider(wsEndPoint);
+
     const api = await ApiPromise.create({provider: wsProvider, types});
     await cryptoWaitReady();
+
     const keyring = new Keyring({ type: 'sr25519' });
-    const alice = keyring.addFromUri('//Alice');
+    const alice = keyring.addFromUri(config.accountUri);
     const info = await api.query.system.account(alice.address);
     let nonce = info.nonce.toNumber();
 
@@ -102,7 +105,6 @@ const worker = async () => {
     }
     let latestBlock = await getLatestBlockNumber(network, apikey);
     let nowBlock = startBlock + 1;
-
 
     while (true) {
         if (latestBlock - delayBlockNum >= nowBlock) {
@@ -133,5 +135,6 @@ const worker = async () => {
         }
     }
 }
+
 worker()
 

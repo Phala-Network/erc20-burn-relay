@@ -1,13 +1,13 @@
 const  ethers = require('ethers');
 const { decodeAddress } = require("@polkadot/util-crypto");
 const { u8aToHex } = require('@polkadot/util');
-const axios = require('axios');
 
 function address2Hex(address) {
     return u8aToHex(decodeAddress(address));
 }
 
 const signer = async () => {
+    // mnemonic for testing only
     const mnemonic = "engage wrist twin hole like orient note muffin educate craft fantasy auto";
     const wallet = ethers.Wallet.fromMnemonic(mnemonic);
 

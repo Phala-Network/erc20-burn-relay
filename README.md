@@ -1,16 +1,22 @@
 # phala-erc20-crawler
 
-## 准备工作
-修改`phala-erc20-crawler/app.js`的`worker()`函数中的变量值: 
-* `network`: `'main'`以太坊主网 或 `'kovan'`以太坊测试网 
-* `contractAddress`: 对应网络中的PHA合约地址，默认为kovan测试网的一个合约地址
-* `defultStartBlock`: 抓取交易的默认起始区块高度，由于claim-pallet还没配置初始的高度，最开始抓取到0的时候使用这个defultStartBlock
-* `wsEndPoint`: PHA节点的地址，本地部署且端口为9944，使用默认的`'ws://127.0.0.1:9944'`即可
+## 配置
+修改`src/config.json`:
+* `network`: `'main'` 或 `'kovan'`
+* `contract`: PHA合约地址
+* `startBlock`: 初始的扫块高度，从PHA主网获取，如果获取到0，使用该配置值
+* `endPoint`: PHA节点的地址，默认的`'ws://127.0.0.1:9944'`
+* `apiKey`: 使用ethersscan的api需要api key
+* `accountUri`: PHA账户，默认使用Alice
 
-## 部署启动
-在已经启动PHA节点的前提下，在根目录下执行：
+## 安装
 ```bash
 yarn
-node app.js
+```
+
+## 运行
+启动PHA节点后执行：
+```bash
+yarn run start
 ```
 
