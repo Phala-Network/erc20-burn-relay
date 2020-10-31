@@ -98,7 +98,7 @@ const worker = async () => {
     let nonce = info.nonce.toNumber();
 
     const delayBlockNum = 15;
-    const endHeight = await api.query.claimModule.endHeight();
+    const endHeight = await api.query.phaClaim.endHeight();
     let startBlock = endHeight.toNumber()
     if (startBlock === 0) {
         startBlock = defultStartBlock
@@ -122,7 +122,7 @@ const worker = async () => {
                 }
             }
             if(claims.length > 0) {
-                await assertSuccess(api.tx.claimModule.storeErc20BurnedTransactions(nowBlock, claims), alice);
+                await assertSuccess(api.tx.phaClaim.storeErc20BurnedTransactions(nowBlock, claims), alice);
                     //.signAndSend(alice, {nonce:nonce}));
                 nonce = nonce+1;
             }
