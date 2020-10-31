@@ -84,7 +84,7 @@ const worker = async () => {
     const network = config.network;
     const contractAddress = config.contract;
     const defultStartBlock = config.startBlock;
-    const apikey = config.startBlock;
+    const apikey = config.apiKey;
 
     const wsEndPoint = config.endPoint;
     const wsProvider = new WsProvider(wsEndPoint);
@@ -93,7 +93,7 @@ const worker = async () => {
     await cryptoWaitReady();
 
     const keyring = new Keyring({ type: 'sr25519' });
-    const alice = keyring.addFromUri(config.accountUri);
+    const alice = keyring.addFromUri(config.accountURI);
     const info = await api.query.system.account(alice.address);
     let nonce = info.nonce.toNumber();
 

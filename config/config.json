@@ -3,7 +3,7 @@
   "network": "kovan",
   "endPoint": "ws://127.0.0.1:9944",
   "contract": "0xfe0c0a5a7fdeb2ecae3e1567568923e035472091",
-  "startBlock": "21639939",
-  "apiKey": "IMP1BNWD46ZT1SMTGIY12YY5V3AN7W6486",
-  "accountUri": "\"box lizard castle truck visit pen metal eyebrow behave globe bring uniform\""
+  "startBlock": 21639939,
+  "apiKey": "H68KQJMESSGK7MZ85DFCJPZ1N47X3CUCAQ",
+  "accountURI": "//Alice"
 }
