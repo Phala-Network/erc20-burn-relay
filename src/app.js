@@ -1,4 +1,4 @@
-const { assert } = require('chai');
+require('dotenv').config();
 const axios = require('axios');
 const querystring = require('querystring');
 const { ApiPromise, WsProvider, Keyring } = require('@polkadot/api');
@@ -6,12 +6,16 @@ const { cryptoWaitReady } = require('@polkadot/util-crypto');
 const BN = require('bn.js');
 
 const types = require('../config/typedefs.json');
-const config = require('../config/config.json');
 
 const ETHERSCAN_API_URL_MAP = {
     main: 'https://api.etherscan.io',
     kovan: 'https://api-kovan.etherscan.io',
 };
+
+const CONTRACT_ADDRESS_MAP = {
+    main: '0x6c5bA91642F10282b576d91922Ae6448C9d52f4E',
+    kovan: '0xfe0c0a5a7fdeb2ecae3e1567568923e035472091',
+}
 
 const getTransactions = async (network, contractaddress, startblock, endblock, apikey) => {
     try {
@@ -27,24 +31,7 @@ const getTransactions = async (network, contractaddress, startblock, endblock, a
         // console.log(result)
         return result;
     } catch (error) {
-        console.error('[getTransactions]', error);
-    }
-}
-
-const getLatestBlockNumber = async (network, apikey) => {
-    try {
-        const module = 'proxy';
-        const action = 'eth_blockNumber';
-        var queryObject = {
-            module, action, apikey
-        };
-        const query = ETHERSCAN_API_URL_MAP[network] + '/api?' + querystring.stringify(queryObject);
-        const resp = await axios.get(query);
-        const result = JSON.parse(JSON.stringify(resp.data))["result"];
-        // console.log(result)
-        return result;
-    } catch (error) {
-        console.error('[getLatestBlockNumber]', error);
+        throw new Error(`[getTransactions]: ${error}`);
     }
 }
 
@@ -64,7 +51,7 @@ async function assertSuccess(txBuilder, signer) {
                     }
                 }
                 if (error) {
-                    assert.fail(`Extrinsic failed with error: ${error}`);
+                    throw new Error(`Extrinsic failed : ${error}`);
                 }
                 unsub();
                 resolve({
@@ -72,7 +59,7 @@ async function assertSuccess(txBuilder, signer) {
                     events: result.events,
                 });
             } else if (result.status.isInvalid) {
-                assert.fail('Invalid transaction');
+                throw new Error('Invalid transaction');
                 unsub();
                 resolve();
             }
@@ -81,58 +68,55 @@ async function assertSuccess(txBuilder, signer) {
 }
 
 const worker = async () => {
-    const network = config.network;
-    const contractAddress = config.contract;
-    const defultStartBlock = config.startBlock;
-    const apikey = config.apiKey;
-
-    const wsEndPoint = config.endPoint;
+    const network = process.env.NETWORK;
+    const contractAddress = CONTRACT_ADDRESS_MAP[network];
+    const defultStartBlock = parseInt(process.env.START_BLOCK);
+    const apikey = process.env.API_KEY;
+    const wsEndPoint = process.env.END_POINT;
     const wsProvider = new WsProvider(wsEndPoint);
 
     const api = await ApiPromise.create({provider: wsProvider, types});
     await cryptoWaitReady();
 
     const keyring = new Keyring({ type: 'sr25519' });
-    const alice = keyring.addFromUri(config.accountURI);
-    const info = await api.query.system.account(alice.address);
-    let nonce = info.nonce.toNumber();
+    const alice = keyring.addFromUri(process.env.ACCOUNT_URI);
 
-    const delayBlockNum = 15;
     const endHeight = await api.query.phaClaim.endHeight();
-    let startBlock = endHeight.toNumber()
+    let startBlock = endHeight.toNumber();
     if (startBlock === 0) {
         startBlock = defultStartBlock
     }
-    let latestBlock = await getLatestBlockNumber(network, apikey);
+    let latestBlock = 999999999;
     let nowBlock = startBlock + 1;
+    let endBlock = nowBlock - 1;
 
     while (true) {
-        if (latestBlock - delayBlockNum >= nowBlock) {
-            console.log(`[worker] crawl ${nowBlock}`);
-            let txs = await getTransactions(network, contractAddress, nowBlock, nowBlock, apikey);
+        console.log(`[worker] crawl from ${nowBlock}`);
+        let txs = [];
+        try {
+            txs = await getTransactions(network, contractAddress, nowBlock, latestBlock, apikey);
             let len = txs.length;
             let claims = new Array();
             for (i = 0; i < len; i++) {
                 let tx = txs[i];
                 if('0x000000000000000000000000000000000000dead' === tx['to']) {
                     let amount = new BN(tx['value']);
-                    amount = amount.divn(1e+6)
+                    amount = amount.divn(1e+3)
                     claims[i] = [tx['hash'], tx['from'], amount];
                     console.log(claims[i], tx['blockNumber']);
+                    endBlock = parseInt(tx['blockNumber']);
                 }
             }
             if(claims.length > 0) {
-                await assertSuccess(api.tx.phaClaim.storeErc20BurnedTransactions(nowBlock, claims), alice);
-                    //.signAndSend(alice, {nonce:nonce}));
-                nonce = nonce+1;
+                await assertSuccess(api.tx.phaClaim.storeErc20BurnedTransactions(endBlock, claims), alice);
             }
-            nowBlock = nowBlock + 1;
-            await sleep(1000);
+            nowBlock = endBlock + 1;
+        } catch (error) {
+            console.log("[worker] crawl error: ", error);
+            break;
         }
-        else {
-            console.log("[worker] wait 6s");
-            await sleep(6000);
-        }
+        console.log("[worker] wait 15s");
+        await sleep(15000);
     }
 }
 
