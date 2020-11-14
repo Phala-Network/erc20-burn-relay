@@ -106,7 +106,7 @@ const worker = async () => {
                     endBlock = parseInt(tx['blockNumber']);
                 }
             }
-            console.log(claims, tx['blockNumber']);
+            console.log(claims);
             if(claims.length > 0) {
                 await assertSuccess(api.tx.phaClaim.storeErc20BurnedTransactions(endBlock, claims), alice);
             }
