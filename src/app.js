@@ -103,7 +103,7 @@ const worker = async () => {
                     let amount = new BN(tx['value']);
                     amount = amount.divn(1e+3)
                     claims.push([tx['hash'], tx['from'], amount]);
-                    endBlock = parseInt(tx['blockNumber']);
+                    endBlock = Math.max(parseInt(tx['blockNumber']), endBlock);
                 }
             }
             console.log(claims);
