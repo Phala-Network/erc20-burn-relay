@@ -102,11 +102,11 @@ const worker = async () => {
                 if('0x000000000000000000000000000000000000dead' === tx['to']) {
                     let amount = new BN(tx['value']);
                     amount = amount.divn(1e+3)
-                    claims[i] = [tx['hash'], tx['from'], amount];
-                    console.log(claims[i], tx['blockNumber']);
+                    claims.push([tx['hash'], tx['from'], amount]);
                     endBlock = parseInt(tx['blockNumber']);
                 }
             }
+            console.log(claims, tx['blockNumber']);
             if(claims.length > 0) {
                 await assertSuccess(api.tx.phaClaim.storeErc20BurnedTransactions(endBlock, claims), alice);
             }
