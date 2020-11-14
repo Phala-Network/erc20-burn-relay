@@ -1,5 +1,8 @@
 # phala-erc20-crawler
 
+## 环境
+node v15.0.1
+
 ## 配置
 根目录下新建`.env`文件，写入环境变量：
 * `NETWORK`: `'main'` 或 `'kovan'`
