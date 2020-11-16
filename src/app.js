@@ -101,7 +101,7 @@ const worker = async () => {
                 let tx = txs[i];
                 if('0x000000000000000000000000000000000000dead' === tx['to']) {
                     let amount = new BN(tx['value']);
-                    amount = amount.divn(1e+3)
+                    amount = amount.divn(1e+2)
                     claims.push([tx['hash'], tx['from'], amount]);
                     endBlock = Math.max(parseInt(tx['blockNumber']), endBlock);
                 }
