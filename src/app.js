@@ -39,7 +39,7 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function assertSuccess(txBuilder, signer) {
+const assertSuccess = async(txBuilder, signer) => {
     return await new Promise(async (resolve, _reject) => {
         const unsub = await txBuilder.signAndSend(signer, (result) => {
             if (result.status.isInBlock) {
