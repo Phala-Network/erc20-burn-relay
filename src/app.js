@@ -92,25 +92,30 @@ const worker = async () => {
 
     while (true) {
         console.log(`[worker] crawl from ${nowBlock}`);
-        let txs = [];
         try {
-            txs = await getTransactions(network, contractAddress, nowBlock, latestBlock, apikey);
-            let len = txs.length;
-            let claims = new Array();
-            for (i = 0; i < len; i++) {
-                let tx = txs[i];
-                if('0x000000000000000000000000000000000000dead' === tx['to']) {
-                    let amount = new BN(tx['value']);
-                    amount = amount.divn(1e+2)
-                    claims.push([tx['hash'], tx['from'], amount]);
-                    endBlock = Math.max(parseInt(tx['blockNumber']), endBlock);
+            let txs = await getTransactions(network, contractAddress, nowBlock, latestBlock, apikey);
+            if(txs !== "Invalid API Key") {
+                let len = txs.length;
+                let claims = new Array();
+                for (i = 0; i < len; i++) {
+                    let tx = txs[i];
+                    if('0x000000000000000000000000000000000000dead' === tx['to']) {
+                        let amount = new BN(tx['value']);
+                        amount = amount.divn(1e+2)
+                        claims.push([tx['hash'], tx['from'], amount]);
+                        endBlock = Math.max(parseInt(tx['blockNumber']), endBlock);
+                    }
                 }
+                console.log(claims);
+                if(claims.length > 0) {
+                    await assertSuccess(api.tx.phaClaim.storeErc20BurnedTransactions(endBlock, claims), alice);
+                }
+                nowBlock = endBlock + 1;
             }
-            console.log(claims);
-            if(claims.length > 0) {
-                await assertSuccess(api.tx.phaClaim.storeErc20BurnedTransactions(endBlock, claims), alice);
+            else {
+                console.log("[worker] crawl error: Invalid API Key");
+                break;
             }
-            nowBlock = endBlock + 1;
         } catch (error) {
             console.log("[worker] crawl error: ", error);
             break;
