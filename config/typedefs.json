@@ -1,6 +1,4 @@
 {
-  "Address": "GenericAddress",
-  "LookupSource": "GenericLookupSource",
   "EthereumAddress": "H160",
   "EcdsaSignature": "[u8; 65]",
   "EthereumTxHash": "H256",
@@ -47,6 +45,17 @@
     "onlineWorkers": "u32",
     "computeWorkers": "u32",
     "fracTargetOnlineReward": "u32",
-    "totalPower": "u32"
+    "totalPower": "u32",
+    "fracTargetComputeReward": "u32"
+  },
+  "MinerStatsDelta": {
+    "numWorker": "i32",
+    "numPower": "i32"
+  },
+  "PayoutReason": {
+    "_enum": {
+	  "OnlineReward": null,
+	  "ComputeReward": null
+	}
   }
 }
