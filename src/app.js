@@ -14,7 +14,7 @@ const ETHERSCAN_API_URL_MAP = {
 
 const CONTRACT_ADDRESS_MAP = {
     main: '0x6c5bA91642F10282b576d91922Ae6448C9d52f4E',
-    kovan: '0xfe0c0a5a7fdeb2ecae3e1567568923e035472091',
+    kovan: '0x512f7a3c14b6ee86c2015bc8ac1fe97e657f75f2',
 }
 
 const getTransactions = async (network, contractaddress, startblock, endblock, apikey) => {
