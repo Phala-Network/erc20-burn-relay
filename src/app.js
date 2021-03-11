@@ -82,7 +82,7 @@ const worker = async () => {
     const alice = keyring.addFromUri(process.env.ACCOUNT_URI);
 
     const endHeight = await api.query.phaClaim.endHeight();
-    let startBlock = endHeight.toNumber();
+    let startBlock = endHeight.unwrapOrDefault().toNumber();
     if (startBlock === 0) {
         startBlock = defultStartBlock
     }
